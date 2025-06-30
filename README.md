@@ -13,6 +13,17 @@ This project uses **Natural Language Processing (NLP)** and **XGBoost** to class
   - Random Forest → 84.8%  
   - XGBoost → 🏆 Best at 85.7%
 - Final model used: **XGBoost + CountVectorizer with bigrams**.
+- 
+### 🔍 Why XGBoost Outperformed Logistic Regression
+
+While Logistic Regression achieved high accuracy (88.7%), XGBoost proved more robust for this task due to the following reasons:
+
+- ✅ **Non-linearity**: XGBoost can model complex, non-linear relationships in text features that Logistic Regression (a linear model) might miss.
+- ✅ **Boosting Strength**: It combines many weak learners (decision trees) to improve performance, reducing both bias and variance.
+- ✅ **Handling Sparse Data**: XGBoost works well with sparse, high-dimensional data produced by `CountVectorizer`, especially with bigrams.
+- ✅ **Feature Interactions**: XGBoost naturally captures feature interactions like `“not good”` or `“very bad”`, which are hard for Logistic Regression to handle without manual engineering.
+
+As a result, even with slightly lower raw accuracy, XGBoost provided better **generalization** and **more consistent predictions** on short and complex reviews.
 
 ---
 
