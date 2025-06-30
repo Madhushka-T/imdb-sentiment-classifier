@@ -4,11 +4,12 @@ import re
 import string
 import nltk
 from nltk.corpus import stopwords
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 # Download stopwords
 nltk.download('stopwords')
 stop_words = set(stopwords.words('english'))
-
+vader = SentimentIntensityAnalyzer()
 # Load model and vectorizer
 model = joblib.load('xgb_imdb_model.pkl')
 vectorizer = joblib.load('tfidf_vectorizer.pkl')
@@ -33,10 +34,23 @@ if st.button("Predict Sentiment"):
         st.warning("Please enter a review.")
     else:
         cleaned = preprocess_text(review_input)
-        transformed = vectorizer.transform([cleaned])
-        prediction = model.predict(transformed)[0]
+        word_count = len(cleaned.split())
 
-        if prediction == 1:
-            st.success("✅ The review is **Positive**.")
+        # Use VADER if sentence is too short
+        if word_count <= 5:
+            vader_score = vader.polarity_scores(cleaned)['compound']
+            if vader_score >= 0.05:
+                st.success("✅ The review is **Positive.**")
+            elif vader_score <= -0.05:
+                st.error("❌ The review is **Negative.**")
+            else:
+                st.info("😐 The review seems **Neutral.**")
         else:
-            st.error("❌ The review is **Negative**.")
+            # Use your ML model for longer reviews
+            transformed = vectorizer.transform([cleaned])
+            prediction = model.predict(transformed)[0]
+
+            if prediction == 1:
+                st.success("✅ The review is **Positive.** (via XGBoost)")
+            else:
+                st.error("❌ The review is **Negative.** (via XGBoost)")
